@@ -11,9 +11,15 @@
   },
   "dependencies": {
     "@nuxt/ui": "4.3.0",
+    "@types/node": "^24.10.7",
+    "jszip": "^3.10.1",
     "nuxt": "^4.2.2",
+    "tailwindcss": "^4.1.17",
     "typescript": "^5.9.3",
     "vue": "^3.5.26",
     "vue-router": "^4.6.4"
+  },
+  "devDependencies": {
+    "@iconify-json/lucide": "^1.2.86"
   }
 }

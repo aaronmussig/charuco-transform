@@ -1,0 +1,40 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+
+body {
+    min-height: 100vh;
+    /*@apply bg-gradient-to-b from-slate-900 to-slate-800;*/
+    background-image: radial-gradient(circle at top center, var(--color-slate-900), var(--color-slate-950));
+}
+
+.fieldGroupBadge {
+    @apply min-w-28;
+}
+
+.theme-h1 {
+    @apply text-indigo-400 text-3xl font-bold;
+}
+
+.theme-h2 {
+    @apply text-slate-100 text-xl font-semibold;
+}
+
+@theme static {
+    --color-primary: var(--color-indigo-500);
+}
+
+:root {
+    --ui-bg: var(--color-slate-950);
+    --ui-text: var(--color-slate-300);
+    --ui-text-inverted: var(--color-white);
+
+    --ui-border: var(--color-indigo-950);
+    --ui-border-accented: var(--color-slate-800);
+
+    --ui-bg-elevated: var(--color-slate-900);
+}
+
+.card-header {
+    @apply bg-indigo-950/30;
+}

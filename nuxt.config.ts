@@ -2,5 +2,19 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ['@nuxt/ui']
+    telemetry: false,
+    ssr: true,
+  modules: ['@nuxt/ui'],
+    css: ['~/assets/css/main.css'],
+    ui: {
+        colorMode: {
+            preference: 'dark'
+        },
+    },
+    vite: {
+        esbuild: {
+            drop: ['debugger'],
+            pure: ['console.log', 'console.error', 'console.warn', 'console.debug', 'console.trace']
+        }
+    }
 })
