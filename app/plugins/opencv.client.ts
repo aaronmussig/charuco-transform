@@ -1,6 +1,3 @@
-const config = useRuntimeConfig()
-const baseURL = config.app.baseURL
-
 export default defineNuxtPlugin((nuxtApp) => {
     const isReady = useState('cv-ready', () => false)
 
@@ -14,7 +11,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
     // 2. Create and inject the script tag
     const script = document.createElement('script')
-    script.src = `${baseURL}lib/opencv-4.13.0.js`
+    script.src = `/charuco-transform/lib/opencv-4.13.0.js`
     script.async = true
     script.type = 'text/javascript'
 
