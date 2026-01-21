@@ -1,2 +1,6 @@
 onlyBuiltDependencies:
   - '@tailwindcss/oxide'
+  - '@parcel/watcher'
+  - 'esbuild'
+  - 'vue-demi'
+  - 'core-js'

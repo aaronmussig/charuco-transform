@@ -46,7 +46,7 @@ const DEFAULT_MARKER_SIZE_MM = 20;
 const DEFAULT_MARKER_MARGIN = 20;
 const DEFAULT_MARKER_MARGIN_UNIT = Unit.PCT;
 const DEFAULT_MARKER_SET = MarkerSet.ARUCO_4X4_1000;
-const DEFAULT_OUTPUT_PARAMETERS = true;
+const DEFAULT_OUTPUT_PARAMETERS = false;
 
 export const useBoard = () => {
 

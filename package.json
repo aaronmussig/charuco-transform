@@ -12,8 +12,10 @@
   "dependencies": {
     "@nuxt/ui": "4.3.0",
     "@types/node": "^24.10.7",
+    "jspdf": "^4.0.0",
     "jszip": "^3.10.1",
     "nuxt": "^4.2.2",
+    "svg2pdf.js": "^2.7.0",
     "tailwindcss": "^4.1.17",
     "typescript": "^5.9.3",
     "vue": "^3.5.26",

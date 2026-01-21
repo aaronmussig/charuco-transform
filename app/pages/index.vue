@@ -5,6 +5,7 @@ import ImageProcessor from "~/components/ImageProcessor.vue";
 import {useBoard} from "~/composables/board";
 import OpenCvImage from "~/components/OpenCvImage.vue";
 import {useProcessor} from "~/composables/processor";
+import Tutorial from "~/components/Tutorial.vue";
 
 const boardConfig = useBoard();
 const processor = useProcessor();
@@ -19,6 +20,7 @@ const nUploadedFiles = processor.nUploadedFiles;
 const downloadFilesAsZip = processor.downloadProcessedFilesAsZip;
 
 const isDownloading = ref(false);
+
 async function downloadProcessedFiles() {
   isDownloading.value = true;
   try {
@@ -47,8 +49,15 @@ onMounted(() => {
   <UContainer class="py-10">
 
     <!-- First row -->
-    <div>
-      <h1 class="mb-4 theme-h1">ChArUco Board Generator & Correction</h1>
+    <div class="flex mb-4">
+      <h1 class="theme-h1">ChArUco Board Generator & Correction</h1>
+      <Tutorial class="ml-5" />
+    </div>
+
+    <!-- Description -->
+    <div class="text-sm">
+      Generate printable ChArUco boards for camera calibration and
+      upload photos of the printed boards for automatic perspective correction and cropping.
     </div>
 
     <!-- Second row -->
@@ -65,9 +74,9 @@ onMounted(() => {
           </h2>
         </template>
 
-        <div class="flex gap-5">
-          <PageSetup class="w-1/2"/>
-          <PagePreview class="w-1/2"/>
+        <div class="flex items-stretch gap-10">
+          <PageSetup class="flex-1"/>
+          <PagePreview class="flex-1"/>
         </div>
 
 
@@ -102,19 +111,20 @@ onMounted(() => {
               3. Download results
             </h2>
             <UButton
+                :disabled="isDownloading"
+                :loading="isDownloading"
                 class="ml-auto mr-0"
-                label="Download images"
                 color="primary"
                 icon="i-lucide-download-cloud"
-                :loading="isDownloading"
-                :disabled="isDownloading"
+                label="Download images"
                 @click="downloadProcessedFiles"
             />
           </div>
         </template>
 
         <div class="mb-5 text-sm">
-          Resulting images have been cropped to a width of {{ gridWidthMm }}mm, and height of {{ gridHeightMm }}mm around the detected board.
+          Resulting images have been cropped to a width of {{ gridWidthMm }}mm, and height of {{ gridHeightMm }}mm
+          around the detected board.
         </div>
 
         <template v-for="(_, index) in uploadedFiles" :key="index">

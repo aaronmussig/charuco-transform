@@ -2,6 +2,7 @@
 import {generatePixelArrayFromBits, generateSvgBlackRect, generateSvgFromPixelArray} from "~/assets/ts/marker";
 import markerData from '~/assets/data/markers.json'
 import {BoardError, useBoard} from "~/composables/board";
+import {convertSvgToPdf} from "~/assets/ts/jspdf";
 
 const svgContainer = ref<HTMLElement | null>(null);
 
@@ -129,6 +130,24 @@ async function generateGrid() {
   svgContainer.value.innerHTML = svg.outerHTML;
 }
 
+function downloadPdf() {
+  if (!svgContainer.value) {
+    return;
+  }
+  const svgData = svgContainer.value.innerHTML;
+
+  // Inject the correct height and width attributes (using a copy)
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(svgData, 'image/svg+xml');
+  const svgDataElem = doc.getElementsByTagName('svg')[0];
+  if (!svgDataElem) {
+    return;
+  }
+  svgDataElem.setAttribute('height', `${pageHeightMm.value}mm`);
+  svgDataElem.setAttribute('width', `${pageWidthMm.value}mm`);
+  convertSvgToPdf(pageWidthMm.value, pageHeightMm.value, svgDataElem, `${outputSvgName.value}.pdf`);
+}
+
 
 function downloadSvg() {
   if (!svgContainer.value) {
@@ -165,45 +184,28 @@ onMounted(() => {
   generateGrid();
 });
 
-const open = ref(false)
-const anchor = ref({x: 0, y: 0})
-
-const reference = computed(() => ({
-  getBoundingClientRect: () =>
-      ({
-        width: 0,
-        height: 0,
-        left: anchor.value.x,
-        right: anchor.value.x,
-        top: anchor.value.y,
-        bottom: anchor.value.y,
-        ...anchor.value
-      } as DOMRect)
-}));
 </script>
 
 <template>
-  <UTooltip
-      :content="{ side: 'right', sideOffset: 16, updatePositionStrategy: 'always' }"
-      :delay-duration="0"
-      :open="open"
-      :reference="reference"
-      text="Download image"
-  >
-    <UButton class="p-5" color="neutral" variant="subtle" @click="downloadSvg"
-             @pointerenter="open = true"
-             @pointerleave="open = false"
-             @pointermove="(ev: PointerEvent) => {
-        anchor.x = ev.clientX
-        anchor.y = ev.clientY
-      }"
-    >
+  <div class="max-w-72">
+
+    <div class="max-h-[50vh] overflow-scroll">
       <div
           ref="svgContainer"
-          class="mx-auto hover:opacity-25 transition duration-150 ease-in-out hover:cursor-pointer"
+          class="mx-auto"
       ></div>
-    </UButton>
-  </UTooltip>
+    </div>
+
+    <div class="flex">
+      <UButton
+          class="hover:cursor-pointer ml-auto mr-0 w-full justify-center rounded-tl-none rounded-tr-none"
+          icon="i-lucide-download"
+          label="Download"
+          @click="downloadPdf"
+      />
+    </div>
+
+  </div>
 
 </template>
 

@@ -34,7 +34,7 @@ function handleReset() {
     <FormPageMargin/>
     <FormMarkerSize/>
     <FormMarkerMargin/>
-    <FormShowParameters/>
+<!--    <FormShowParameters/>-->
 
     <UAlert
         v-if="boardErrors && boardErrors.length > 0"
