@@ -1,8 +1,7 @@
 <script lang="ts" setup>
-import {Unit, useBoard, BoardError} from "~/composables/board";
-import {isNumber} from "~/assets/ts/common";
-import type {SelectItem} from "@nuxt/ui";
+import {Unit, UNIT_OPTIONS, useBoard} from "~/composables/board";
 import {useProcessor} from "~/composables/processor";
+import {useNumericInput} from "~/composables/form";
 
 const boardConfig = useBoard();
 const pageMargin = boardConfig.pageMargin;
@@ -13,77 +12,40 @@ const pageHeightMm = boardConfig.pageHeightMm;
 const processor = useProcessor();
 const nUploadedFiles = processor.nUploadedFiles;
 
-const inputForm = ref(pageMargin.value);
-const isValid = ref(true);
-
-const items: SelectItem[] = ref([
-  {label: 'mm', value: Unit.MM},
-  {label: '%', value: Unit.PCT}
-]);
-
-// If the model changes externally, update the value
-watch(pageMargin, (v) => {
-  inputForm.value = v;
-});
-
-// Validate that the value is a number
-watch(inputForm, (v: string) => {
-  // Not a number
-  if (!isNumber(v)) {
-    isValid.value = false;
-    return;
-  }
-  // Convert to number
-  const cast = Number(v);
-
-  // Do not allow less than 0
-  if (cast < 0) {
-    isValid.value = false;
-    return;
-  }
-
-  // Do not allow margins larger than page size
+const validationFn = (value: number): boolean => {
   if (pageMarginUnit.value === Unit.MM) {
-    if (cast * 2 >= pageWidthMm.value || cast * 2 >= pageHeightMm.value) {
-      isValid.value = false;
-      return;
+    if (value * 2 >= pageWidthMm.value || value * 2 >= pageHeightMm.value) {
+      return false;
     }
-  } else {
-    if (cast >= 50) {
-      isValid.value = false;
-      return;
-    }
+  } else if (value >= 50) {
+    return false;
   }
-
-  // All good, set the value
-  pageMargin.value = cast
-  isValid.value = true;
-});
-
-function maybeReset() {
-  if (!isValid.value) {
-    inputForm.value = pageMargin.value;
-    isValid.value = true;
-  }
+  return true;
 }
+
+const numericInput = useNumericInput(pageMargin, validationFn);
+
+const isValid = numericInput.isValid;
+const inputForm = numericInput.inputForm;
+const maybeReset = numericInput.maybeReset;
 </script>
 
 <template>
   <UFieldGroup class="w-full">
-    <UBadge color="neutral" label="Page margin" size="lg" variant="outline" class="fieldGroupBadge" />
+    <UBadge class="fieldGroupBadge" color="neutral" label="Page margin" size="lg" variant="outline"/>
     <UInput
         v-model="inputForm"
         :color="isValid ? 'primary' : 'error'"
+        :disabled="nUploadedFiles > 0"
         :highlight="!isValid"
         type="number"
         @blur="maybeReset"
-        :disabled="nUploadedFiles > 0"
     />
     <USelect
         v-model="pageMarginUnit"
-        :items="items"
-        class="min-w-20"
         :disabled="nUploadedFiles > 0"
+        :items="UNIT_OPTIONS"
+        class="min-w-20"
     />
   </UFieldGroup>
 </template>

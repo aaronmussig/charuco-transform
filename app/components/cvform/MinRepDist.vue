@@ -1,32 +1,13 @@
 <script lang="ts" setup>
-import {isNumber} from "~/assets/ts/common";
+import {useNumericInput} from "~/composables/form";
 
 const model = defineModel<number>();
 
-const isValid = ref(true);
-const inputForm = ref(model.value);
+const numericInput = useNumericInput(model);
 
-// Validate that the value is a number
-watch(inputForm, (v: string) => {
-  if (!isNumber(v)) {
-    isValid.value = false;
-    return;
-  }
-  const cast = parseFloat(v);
-  if (isNaN(cast)) {
-    isValid.value = false;
-    return;
-  }
-  isValid.value = true;
-  model.value = cast;
-});
-
-function maybeReset() {
-  if (!isValid.value) {
-    inputForm.value = model.value;
-    isValid.value = true;
-  }
-}
+const isValid = numericInput.isValid;
+const inputForm = numericInput.inputForm;
+const maybeReset = numericInput.maybeReset;
 </script>
 
 <template>
@@ -40,7 +21,7 @@ function maybeReset() {
         @blur="maybeReset"
     />
     <UTooltip
-        :content="{align: 'left', side: 'right', sideOffset: 8}"
+        :content="{align: 'start', side: 'right', sideOffset: 8}"
         :delay-duration="0"
         :ui="{content: 'px-4 py-10'}"
     >

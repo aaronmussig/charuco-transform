@@ -1,12 +1,12 @@
 import {jsPDF} from "jspdf";
 import 'svg2pdf.js';
 
-export function convertSvgToPdf(width: number, height: number, svgEle: HTMLElement, fileName: string) {
+export function convertSvgToPdf(width: number, height: number, svgEle: Element, fileName: string) {
 
     const doc = new jsPDF({
         unit: "mm",
         format: [height, width],
-        compressPdf: false,
+        compress: false,
         putOnlyUsedFonts: false,
     });
 

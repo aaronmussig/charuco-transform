@@ -13,10 +13,6 @@ import CheckAllOrdersForm from "~/components/cvform/CheckAllOrdersForm.vue";
 import {useProcessor} from "~/composables/processor";
 
 const props = defineProps({
-  // file: {
-  //   type: File,
-  //   required: true
-  // },
   index: {
     type: Number,
     required: true
@@ -74,6 +70,13 @@ async function processImageWrapper() {
 }
 
 async function processImage() {
+
+  // Abort if file is undefined
+  if (file.value == null) {
+    console.error('No file provided to process.');
+    outputMessages.value.push('No file provided to process.');
+    return;
+  }
 
   // Load OpenCV
   const opencv = cv()
@@ -190,7 +193,17 @@ async function processImage() {
 
           // Save the warped image
           processedImage.value = await convertOpenCvImgToBlob(opencv, flattened);
-          allProcessedImages.value.set(props.index, processedImage.value);
+
+          // Check if its null
+          if (processedImage.value == null) {
+            outputMessages.value.push('Unable to convert processed image to displayable format.');
+            console.error('Processed image conversion returned null.');
+            return;
+          } else {
+            allProcessedImages.value.set(props.index, processedImage.value);
+          }
+
+          // Done.
         } finally {
           H.delete();
         }
@@ -220,6 +233,11 @@ async function processImage() {
 }
 
 onMounted(() => {
+  // Check if file is defined
+  if (file.value == null) {
+    outputMessages.value.push('File was not defined, this is a software error!');
+    return;
+  }
   originalImage.value = URL.createObjectURL(file.value);
   processImageWrapper();
 });
@@ -232,11 +250,11 @@ onMounted(() => {
     <!-- First column -->
     <div class="flex-1 flex flex-col overflow-hidden">
       <div class="text-sm font-bold mb-2 truncate">
-        {{ file.name }}
+        {{ file?.name }}
       </div>
 
       <UModal v-if="originalImage != null">
-        <UButton label="Open" class="w-full h-full object-contain" color="neutral" variant="ghost" >
+        <UButton class="w-full h-full object-contain" color="neutral" label="Open" variant="ghost">
           <img
               :src="originalImage"
               alt="Original image."
@@ -288,7 +306,7 @@ onMounted(() => {
     <div class="flex-1 flex flex-col overflow-hidden">
       <!-- The processed image -->
       <UModal v-if="processedImage != null">
-        <UButton label="Open" class="w-full h-full object-contain" color="neutral" variant="ghost" >
+        <UButton class="w-full h-full object-contain" color="neutral" label="Open" variant="ghost">
           <img
               :src="processedImage"
               alt="Loading processed image..."

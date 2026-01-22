@@ -147,3 +147,5 @@ vite.config.ts.timestamp-*
 .DS_Store
 .fleet
 .idea/
+
+tsconfig.tsbuildinfo

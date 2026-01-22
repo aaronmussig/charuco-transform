@@ -19,6 +19,11 @@ export const useProcessor = () => {
         const zip = new JSZip();
         const folder = zip.folder("processed-images");
 
+        if (folder == null) {
+            console.error("Failed to create folder in ZIP");
+            return;
+        }
+
         // Create an array of promises to fetch all blobs in parallel
         const fetchPromises = Array.from(processedFiles.value.entries()).map(async ([index, blobUrl]) => {
             try {

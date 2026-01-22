@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { useBoard} from "~/composables/board";
-import {isNumber} from "~/assets/ts/common";
+import {useBoard} from "~/composables/board";
 import {useProcessor} from "~/composables/processor";
+import {useNumericInput} from "~/composables/form";
 
 const boardConfig = useBoard();
 const markerSize = boardConfig.markerSizeMm;
@@ -11,62 +11,36 @@ const boardHeightMm = boardConfig.pageHeightMm;
 const processor = useProcessor();
 const nUploadedFiles = processor.nUploadedFiles;
 
-const inputForm = ref(markerSize.value);
-const isValid = ref(true);
-
-// If the model changes externally, update the value
-watch(markerSize, (newValue) => {
-  inputForm.value = newValue;
-});
-
-// Validate that the value is a number
-watch(inputForm, (v: string) => {
-  // Check if it is a number
-  if (!isNumber(v)) {
-    isValid.value = false;
-    return;
+const validationFn = (value: number): boolean => {
+  if (value <= 0) {
+    return false;
   }
-
-  // Cast to a number
-  const cast = Number(v);
-
-  // Check if less than or equal to zero
-  if (cast <= 0) {
-    isValid.value = false;
-    return;
-  }
-
   // Check if too large
-  if (cast * 2 >= boardWidthMm.value || cast * 2 >= boardHeightMm.value) {
-    isValid.value = false;
-    return;
+  if (value * 2 >= boardWidthMm.value || value * 2 >= boardHeightMm.value) {
+    return false;
   }
-
-  // All good
-  markerSize.value = cast
-  isValid.value = true;
-});
-
-function maybeReset() {
-  if (!isValid.value) {
-    inputForm.value = markerSize.value;
-    isValid.value = true;
-  }
+  return true;
 }
+
+const numericInput = useNumericInput(markerSize, validationFn);
+
+const isValid = numericInput.isValid;
+const inputForm = numericInput.inputForm;
+const maybeReset = numericInput.maybeReset;
 </script>
 
 <template>
   <UFieldGroup>
-    <UBadge color="neutral" label="Marker size" size="lg" variant="outline" class="fieldGroupBadge" />
+    <UBadge class="fieldGroupBadge" color="neutral" label="Marker size" size="lg" variant="outline"/>
     <UInput
         v-model="inputForm"
         :color="isValid ? 'primary' : 'error'"
+        :disabled="nUploadedFiles > 0"
         :highlight="!isValid"
         type="number"
         @blur="maybeReset"
-        :disabled="nUploadedFiles > 0"
     />
-    <UBadge color="neutral" label="mm" size="lg" variant="outline" class="min-w-20" />
+    <UBadge class="min-w-20" color="neutral" label="mm" size="lg" variant="outline"/>
   </UFieldGroup>
 </template>
 

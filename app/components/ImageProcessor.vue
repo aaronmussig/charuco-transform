@@ -23,7 +23,6 @@ const uploadedFiles = processor.uploadedFiles;
 
 // const showCvMarkerOutput = useShowCvMarkerOutput();
 
-
 const canvasRef = ref();
 
 const processedImages = ref<string[]>([]);

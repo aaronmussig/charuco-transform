@@ -2,6 +2,7 @@
 
 import {MARKERS} from "~/assets/ts/marker";
 import markerData from "~/assets/data/markers.json";
+import type {SelectItem} from "@nuxt/ui";
 
 export enum MarkerSet {
     ARUCO = "aruco",
@@ -10,6 +11,14 @@ export enum MarkerSet {
     ARUCO_6X6_1000 = "6x6_1000",
     ARUCO_7X7_1000 = "7x7_1000",
 }
+
+export const MARKER_SET_OPTIONS: SelectItem[] = [
+    {label: 'Original ArUco (1024)', value: MarkerSet.ARUCO},
+    {label: 'ArUco 4x4 (1000)', value: MarkerSet.ARUCO_4X4_1000},
+    {label: 'ArUco 5x5 (1000)', value: MarkerSet.ARUCO_5X5_1000},
+    {label: 'ArUco 6x6 (1000)', value: MarkerSet.ARUCO_6X6_1000},
+    {label: 'ArUco 7x7 (1000)', value: MarkerSet.ARUCO_7X7_1000},
+];
 
 export enum PageSize {
     CUSTOM = "Custom",
@@ -21,10 +30,25 @@ export enum PageSize {
     A5 = "A5"
 }
 
+export const PAGE_SIZE_OPTIONS: SelectItem[] = [
+    {label: 'Custom', value: PageSize.CUSTOM},
+    {label: 'A0', value: PageSize.A0},
+    {label: 'A1', value: PageSize.A1},
+    {label: 'A2', value: PageSize.A2},
+    {label: 'A3', value: PageSize.A3},
+    {label: 'A4', value: PageSize.A4},
+    {label: 'A5', value: PageSize.A5},
+];
+
 export enum Unit {
     MM = "mm",
     PCT = "%",
 }
+
+export const UNIT_OPTIONS: SelectItem[] = [
+    {label: 'mm', value: Unit.MM},
+    {label: '%', value: Unit.PCT}
+];
 
 export enum BoardError {
     MARKER_NOT_ENOUGH = "Not enough markers to fill the board.",
@@ -105,10 +129,20 @@ export const useBoard = () => {
         return Object.keys(markerData[markerSet.value]).length;
     });
     const markerBitsWidth = computed<number>(() => {
-        return MARKERS[markerSet.value].width;
+        const currentMarker = MARKERS[markerSet.value];
+        if (currentMarker == null) {
+            console.error(`Marker set ${markerSet.value} not found in MARKERS data.`);
+            return 0;
+        }
+        return currentMarker.width;
     });
     const markerBitsHeight = computed<number>(() => {
-        return MARKERS[markerSet.value].height;
+        const currentMarker = MARKERS[markerSet.value];
+        if (currentMarker == null) {
+            console.error(`Marker set ${markerSet.value} not found in MARKERS data.`);
+            return 0;
+        }
+        return currentMarker.height;
     });
     const markerTrueSizeMm = computed<number>(() => {
         return markerSizeMm.value - (2 * markerMarginMm.value);
@@ -120,8 +154,15 @@ export const useBoard = () => {
         return (pageHeightMm.value - gridHeightMm.value) / 2
     });
     const outputParameterString = computed<string>(() => {
+        const currentMarker = MARKERS[markerSet.value];
+        let markerName = 'ERROR';
+        if (currentMarker == null) {
+            console.error(`Marker set ${markerSet.value} not found in MARKERS data.`);
+        } else {
+            markerName = currentMarker.name;
+        }
         const values = [
-            `${MARKERS[markerSet.value].name}`,
+            markerName,
         ];
         if (pageSize.value !== PageSize.CUSTOM) {
             values.push(`${pageSize.value}`);
@@ -134,8 +175,15 @@ export const useBoard = () => {
         return values.join(' | ');
     });
     const outputSvgName = computed<string>(() => {
+        const currentMarker = MARKERS[markerSet.value];
+        let markerName = 'ERROR';
+        if (currentMarker == null) {
+            console.error(`Marker set ${markerSet.value} not found in MARKERS data.`);
+        } else {
+            markerName = currentMarker.name;
+        }
         const values = ['ChArUco'];
-        values.push(`${MARKERS[markerSet.value].name}`);
+        values.push(markerName);
         if (pageSize.value !== PageSize.CUSTOM) {
             values.push(`${pageSize.value}`);
         } else {

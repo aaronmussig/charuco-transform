@@ -7,10 +7,12 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "upgrade": "nuxt upgrade",
+    "check": "nuxi typecheck"
   },
   "dependencies": {
-    "@nuxt/ui": "4.3.0",
+    "@nuxt/ui": "4.4.0",
     "@types/node": "^24.10.7",
     "jspdf": "^4.0.0",
     "jszip": "^3.10.1",
@@ -22,6 +24,16 @@
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
-    "@iconify-json/lucide": "^1.2.86"
+    "@iconify-json/lucide": "^1.2.86",
+    "vue-tsc": "^3.2.2"
+  },
+  "pnpm": {
+    "overrides": {
+      "@tiptap/core": "3.16.0",
+      "@tiptap/pm": "3.16.0",
+      "@tiptap/extension-drag-handle": "3.16.0",
+      "@tiptap/extension-node-range": "3.16.0",
+      "@tiptap/extension-collaboration": "3.16.0"
+    }
   }
 }

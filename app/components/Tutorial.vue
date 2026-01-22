@@ -2,16 +2,11 @@
 import type {StepperItem} from '@nuxt/ui';
 
 
-
-
-
-
 const items: StepperItem[] = [
   {slot: 'generate' as const, title: 'Generate', description: ''},
   {slot: 'print' as const, title: 'Print', description: ''},
   {slot: 'upload' as const, title: 'Upload', description: ''},
 ];
-
 
 
 const stepper = useTemplateRef('stepper');
@@ -61,7 +56,7 @@ const stepper = useTemplateRef('stepper');
 
           <template #generate>
             <div class="flex">
-              <img class="mx-auto max-w-2/3" src="~/assets/img/tutorial-step-1.png" alt="Tutorial parameter selection" />
+              <img alt="Tutorial parameter selection" class="mx-auto max-w-2/3" src="~/assets/img/tutorial-step-1.png"/>
             </div>
           </template>
 
@@ -71,13 +66,13 @@ const stepper = useTemplateRef('stepper');
               disable any page scaling options.
             </div>
             <div class="flex mt-3">
-              <img class="mx-auto max-w-2/3" src="~/assets/img/tutorial-step-2.png" alt="Tutorial print" />
+              <img alt="Tutorial print" class="mx-auto max-w-2/3" src="~/assets/img/tutorial-step-2.png"/>
             </div>
           </template>
 
           <template #upload>
             <div class="flex mt-3">
-              <img class="mx-auto max-w-2/3" src="~/assets/img/tutorial-step-3.png" alt="Tutorial upload" />
+              <img alt="Tutorial upload" class="mx-auto max-w-2/3" src="~/assets/img/tutorial-step-3.png"/>
             </div>
           </template>
 

@@ -1,50 +1,39 @@
 <script lang="ts" setup>
 import {PageSize, useBoard} from "~/composables/board";
-import {isNumber} from "~/assets/ts/common";
 import {useProcessor} from "~/composables/processor";
+import {useNumericInput} from "~/composables/form";
 
 const boardConfig = useBoard();
 const pageWidthMm = boardConfig.pageWidthMm;
 const pageSize = boardConfig.pageSize;
 
-const inputForm = ref(pageWidthMm.value);
-const isValid = ref(true);
-
 const processor = useProcessor();
 const nUploadedFiles = processor.nUploadedFiles;
 
-// If the model changes externally, update the value
-watch(pageWidthMm, (v) => {
-  inputForm.value = v;
-});
+const validationFn = (value: number): boolean => {
+  if (value <= 0) {
+    return false;
+  }
+  return true;
+}
 
-// Validate that the value is a number
-watch(inputForm, (v: string) => {
-  if (!isNumber(v)) {
-    isValid.value = false;
-    return;
-  }
-  const cast = Number(v);
-  if (cast <= 0) {
-    isValid.value = false;
-    return;
-  }
-  pageWidthMm.value = cast
-  isValid.value = true;
-});
+const numericInput = useNumericInput(pageWidthMm, validationFn);
+const isValid = numericInput.isValid;
+const inputForm = numericInput.inputForm;
+const maybeReset = numericInput.maybeReset;
 </script>
 
 <template>
-  <UFieldGroup class="w-full" v-show="pageSize === PageSize.CUSTOM">
-    <UBadge color="neutral" label="Page width" size="lg" variant="outline" class="fieldGroupBadge"/>
+  <UFieldGroup v-show="pageSize === PageSize.CUSTOM" class="w-full">
+    <UBadge class="fieldGroupBadge" color="neutral" label="Page width" size="lg" variant="outline"/>
     <UInput
         v-model="inputForm"
         :color="isValid ? 'primary' : 'error'"
+        :disabled="nUploadedFiles > 0"
         :highlight="!isValid"
         type="number"
-        :disabled="nUploadedFiles > 0"
     />
-    <UBadge color="neutral" label="mm" size="lg" variant="outline" class="min-w-20" />
+    <UBadge class="min-w-20" color="neutral" label="mm" size="lg" variant="outline"/>
   </UFieldGroup>
 </template>
 

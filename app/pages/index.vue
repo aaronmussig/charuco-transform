@@ -33,7 +33,10 @@ async function downloadProcessedFiles() {
 // Update the URL as parameters change
 watch(urlParams, (newParams) => {
   const queryString = new URLSearchParams(newParams).toString();
-  const newUrl = `${window.location.pathname}?${queryString}`;
+  let newUrl = `${window.location.pathname}`;
+  if (queryString.length > 0) {
+    newUrl += `?${queryString}`;
+  }
   window.history.replaceState({}, '', newUrl);
 }, {deep: true});
 

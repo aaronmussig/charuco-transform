@@ -85,6 +85,11 @@ async function generateGrid() {
         const adjustedTopLeftY = topLeftY + markerMarginMm.value;
 
         const markerBits = markerData[markerSetVal.value][markerId];
+        if (markerBits == null) {
+          console.warn(`Marker ID ${markerId} not found in marker set ${markerSetVal.value}.`);
+          continue;
+        }
+
         const pixelArr = generatePixelArrayFromBits(markerBits, markerBitsHeight.value, markerBitsWidth.value);
         const svgElements = generateSvgFromPixelArray(
             pixelArr, markerBitsHeight.value, markerBitsWidth.value, adjustedTopLeftX, adjustedTopLeftY, markerScale

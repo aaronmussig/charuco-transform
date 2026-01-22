@@ -6,7 +6,7 @@ const model = defineModel<boolean>();
   <div class="flex">
     <UCheckbox v-model="model" label="Check all orders"/>
     <UTooltip
-        :content="{align: 'left', side: 'right', sideOffset: 8}"
+        :content="{align: 'start', side: 'right', sideOffset: 8}"
         :delay-duration="0"
         :ui="{content: 'px-4 py-10'}"
     >

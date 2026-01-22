@@ -52,24 +52,24 @@ export async function readFileToOpenCv(opencv: any, file: File, dstImage: any): 
             if (!ctx) {
                 console.error("Could not get canvas context.");
                 resolve(false);
+            } else {
+                ctx.drawImage(img, 0, 0)
+
+                // Read from the canvas into OpenCV
+                const srcImage = opencv.imread(tempCanvas)
+
+                try {
+                    // https://docs.opencv.org/4.13.0/d8/d01/group__imgproc__color__conversions.html
+                    opencv.cvtColor(srcImage, dstImage, opencv.COLOR_BGRA2BGR)
+                    resolve(true);
+                } catch (e) {
+                    console.error("Error converting image color:", e);
+                    resolve(false);
+                } finally {
+                    srcImage.delete();
+                    URL.revokeObjectURL(img.src);
+                }
             }
-            ctx.drawImage(img, 0, 0)
-
-            // Read from the canvas into OpenCV
-            const srcImage = opencv.imread(tempCanvas)
-
-            try {
-                // https://docs.opencv.org/4.13.0/d8/d01/group__imgproc__color__conversions.html
-                opencv.cvtColor(srcImage, dstImage, opencv.COLOR_BGRA2BGR)
-                resolve(true);
-            } catch (e) {
-                console.error("Error converting image color:", e);
-                resolve(false);
-            } finally {
-                srcImage.delete();
-                URL.revokeObjectURL(img.src);
-            }
-
         }
 
         // Handle image loading errors

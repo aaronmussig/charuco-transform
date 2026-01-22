@@ -3,7 +3,6 @@ import FormPageSize from "~/components/form/FormPageSize.vue";
 import FormPageHeight from "~/components/form/FormPageHeight.vue";
 import FormPageMargin from "~/components/form/FormPageMargin.vue";
 import FormMarkerSize from "~/components/form/FormMarkerSize.vue";
-import FormShowParameters from "~/components/form/FormShowParameters.vue";
 
 import {useBoard} from "~/composables/board";
 import {useProcessor} from "~/composables/processor";
@@ -19,8 +18,6 @@ function handleReset() {
   resetToDefaults();
   resetUploadedFiles();
 }
-
-
 </script>
 
 <template>
@@ -34,7 +31,7 @@ function handleReset() {
     <FormPageMargin/>
     <FormMarkerSize/>
     <FormMarkerMargin/>
-<!--    <FormShowParameters/>-->
+    <!--    <FormShowParameters/>-->
 
     <UAlert
         v-if="boardErrors && boardErrors.length > 0"

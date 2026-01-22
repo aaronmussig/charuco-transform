@@ -32,7 +32,7 @@ export function generatePixelArrayFromBits(bytes: number[], height: number, widt
     return bits;
 }
 
-export function generateSvgFromPixelArray(bits: number[], height: number, width: number, topLeftX: number, topLeftY: number, scale: number): SVGElement[] {
+export function generateSvgFromPixelArray(bits: number[], height: number, width: number, topLeftX: number, topLeftY: number, scale: number): HTMLElement[] {
     const elements = [];
 
     // Create the border + background
@@ -45,23 +45,23 @@ export function generateSvgFromPixelArray(bits: number[], height: number, width:
             if (!white) continue;
 
             const pixel = document.createElement('rect');
-            pixel.setAttribute('width', 1 * scale);
-            pixel.setAttribute('height', 1 * scale);
-            pixel.setAttribute('x', (j + 1) * scale + topLeftX);
-            pixel.setAttribute('y', (i + 1)* scale + topLeftY);
+            pixel.setAttribute('width', `${scale}`);
+            pixel.setAttribute('height', `${scale}`);
+            pixel.setAttribute('x', `${(j + 1) * scale + topLeftX}`);
+            pixel.setAttribute('y', `${(i + 1) * scale + topLeftY}`);
             pixel.setAttribute('fill', 'white');
 
             if ((j < width - 1) && (bits[i * height + j + 1])) {
-                pixel.setAttribute('width', 1.5 * scale);
+                pixel.setAttribute('width', `${1.5 * scale}`);
             }
             elements.push(pixel);
 
             if ((i < height - 1) && (bits[(i + 1) * height + j])) {
                 const pixel2 = document.createElement('rect');
-                pixel2.setAttribute('width', 1 * scale);
-                pixel2.setAttribute('height', 1.5 * scale);
-                pixel2.setAttribute('x', (j + 1) * scale + topLeftX);
-                pixel2.setAttribute('y', (i + 1) * scale + topLeftY);
+                pixel2.setAttribute('width', `${scale}`);
+                pixel2.setAttribute('height', `${1.5 * scale}`);
+                pixel2.setAttribute('x', `${(j + 1) * scale + topLeftX}`);
+                pixel2.setAttribute('y', `${(i + 1) * scale + topLeftY}`);
                 pixel2.setAttribute('fill', 'white');
                 elements.push(pixel2);
             }
@@ -70,12 +70,12 @@ export function generateSvgFromPixelArray(bits: number[], height: number, width:
     return elements;
 }
 
-export function generateSvgBlackRect(topLeftX: number, topLeftY: number, width: number, height: number): SVGElement {
+export function generateSvgBlackRect(topLeftX: number, topLeftY: number, width: number, height: number): HTMLElement {
     const rect = document.createElement('rect');
-    rect.setAttribute('x', topLeftX);
-    rect.setAttribute('y', topLeftY);
-    rect.setAttribute('width', width);
-    rect.setAttribute('height', height);
+    rect.setAttribute('x', `${topLeftX}`);
+    rect.setAttribute('y', `${topLeftY}`);
+    rect.setAttribute('width', `${width}`);
+    rect.setAttribute('height', `${height}`);
     rect.setAttribute('fill', 'black');
     return rect;
 }
