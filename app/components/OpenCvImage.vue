@@ -2,7 +2,7 @@
 import {useBoard} from "~/composables/board";
 import {
   calculateNativePxPerMm,
-  convertOpenCvImgToBlob,
+  convertOpenCvImgToBlob, correctCameraDistortion,
   createOpenCvMatMapsFromChArUcoDetection,
   readFileToOpenCv,
   selectOpenCvMarkers
@@ -11,6 +11,7 @@ import MinRepDist from "~/components/cvform/MinRepDist.vue";
 import ErrCorrectRate from "~/components/cvform/ErrCorrectRate.vue";
 import CheckAllOrdersForm from "~/components/cvform/CheckAllOrdersForm.vue";
 import {useProcessor} from "~/composables/processor";
+import {getCameraMetadata, type ImageMetadata} from "~/assets/ts/image";
 
 const props = defineProps({
   index: {
@@ -47,6 +48,8 @@ const allProcessedImages = processor.processedFiles;
 
 const outputMessages = ref<string[]>([]);
 
+const imageMetadata = ref<ImageMetadata | null>(null);
+
 // Re-add the processed image if present and uploadedFiles changes
 watch(uploadedFiles, () => {
   if (processedImage.value != null) {
@@ -56,10 +59,15 @@ watch(uploadedFiles, () => {
 
 async function processImageWrapper() {
   try {
+    if (file.value == null) {
+      outputMessages.value.push('File was not defined, this is a software error!');
+      return;
+    }
     isImageLoading.value = true;
     processedImage.value = null;
     outputMessages.value = [];
     allProcessedImages.value.delete(props.index);
+    imageMetadata.value = await getCameraMetadata(file.value);
     await processImage();
   } catch (e) {
     outputMessages.value.push(`${e}`);
@@ -126,6 +134,8 @@ async function processImage() {
       return
     }
 
+
+
     // create the detector
     console.log('Creating detector')
 
@@ -134,6 +144,9 @@ async function processImage() {
 
     // https://docs.opencv.org/4.13.0/d1/dcd/structcv_1_1aruco_1_1DetectorParameters.html
     const detectorParams = new opencv.aruco_DetectorParameters();
+
+    // https://docs.opencv.org/4.13.0/de/d67/group__objdetect__aruco.html#gafce26321f39d331bc12032a72b90eda6
+    detectorParams.cornerRefinementMethod = opencv.CORNER_REFINE_SUBPIX;
 
     // https://docs.opencv.org/4.13.0/d5/d09/structcv_1_1aruco_1_1RefineParameters.html
     const refineParams = new opencv.aruco_RefineParameters(minRepDistance.value, errorCorrectionRate.value, checkAllOrders.value);
@@ -161,9 +174,19 @@ async function processImage() {
     // Only do it if we have data
     if (charucoCorners.rows >= 4) {
 
-      console.log('We have enough rows')
+      console.log('We have enough rows');
 
-      const pxPerMm = Math.ceil(calculateNativePxPerMm(charucoIds, charucoCorners, markerSize.value));
+      console.log('Correcting camera distortion');
+      const correctedImg = correctCameraDistortion(
+          opencv, dstImage, charucoCorners, charucoIds, nCols.value, markerSize.value, imageMetadata.value
+      );
+      const finalCorners = new opencv.Mat();
+      const finalIds = new opencv.Mat();
+      detector.detectBoard(correctedImg, finalCorners, finalIds, markerCorners, markerIds);
+
+
+
+      const pxPerMm = Math.ceil(calculateNativePxPerMm(finalIds, finalCorners, markerSize.value));
 
       console.log(`Detected marker size in pixels: ${pxPerMm}px per mm`);
 
@@ -174,7 +197,7 @@ async function processImage() {
 
       // Map detected IDs to their source position
       const [srcMat, dstMat] = createOpenCvMatMapsFromChArUcoDetection(
-          opencv, charucoIds, charucoCorners, nCols.value, markerSize.value, pxPerMm
+          opencv, finalIds, finalCorners, nCols.value, markerSize.value, pxPerMm
       );
       console.log('matricies made')
 
@@ -189,7 +212,7 @@ async function processImage() {
           // 5. Warp the Image
           const dsize = new opencv.Size(outW, outH);
           // https://docs.opencv.org/4.13.0/da/d54/group__imgproc__transform.html#gaf73673a7e8e18ec6963e3774e6a94b87
-          opencv.warpPerspective(dstImage, flattened, H, dsize, opencv.INTER_LINEAR, opencv.BORDER_CONSTANT, new opencv.Scalar());
+          opencv.warpPerspective(correctedImg, flattened, H, dsize, opencv.INTER_LINEAR, opencv.BORDER_CONSTANT, new opencv.Scalar());
 
           // Save the warped image
           processedImage.value = await convertOpenCvImgToBlob(opencv, flattened);
